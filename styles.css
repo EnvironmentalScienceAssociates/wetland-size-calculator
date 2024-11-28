@@ -1,0 +1,51 @@
+input[type="number"] {
+  max-width: 80%;
+}
+
+div.outer {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* Customize fonts */
+body, label, input, button, select { 
+  font-family: 'Helvetica Neue', Helvetica;
+  font-weight: 200;
+}
+h1, h2, h3, h4 { font-weight: 400; }
+
+#controls {
+  /* Appearance */
+  background-color: white;
+  padding: 0 0 0 0;
+  cursor: move;
+  opacity: 0.95;
+}
+
+#plots {
+  /* Appearance */
+  background-color: white;
+  padding: 0 20px 0 20px;
+  cursor: move;
+  opacity: 0.95;
+}
+
+/* If not using map tiles, show a white background */
+.leaflet-container {
+  background-color: white !important;
+}
+
+/* https://stackoverflow.com/a/53486851 */
+.leaflet-top.leaflet-left .leaflet-control {
+    display: inline-block;
+    float: none;
+}
+
+.leaflet-top.leaflet-right .leaflet-control {
+  margin-right: 385px;
+}

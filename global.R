@@ -18,7 +18,7 @@ calc_side <- function(area){
 }
 
 calc_coords <- function(dist){
-  ne_pt = matrix(c(-121.805, 38.24), nrow = 1, ncol = 2)
+  ne_pt = matrix(c(-121.805556, 38.241667), nrow = 1, ncol = 2)
   colnames(ne_pt) = c("lon", "lat")
   nw_pt = destPoint(p = ne_pt, b = 270, d = dist)
   sw_pt = destPoint(p = nw_pt, b = 180, d = dist)

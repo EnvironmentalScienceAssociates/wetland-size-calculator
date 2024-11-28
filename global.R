@@ -9,7 +9,7 @@ library(geosphere)
 calc_area <- function(flow, N, rt, eff, season = c("winter", "summer")){
   x = if (season == "winter") 824.7 else 59.5
   # in acres
-  round((((((flow * 3785.41178*1000) * N)/x)/4046.86)/rt) * eff, 2)
+  (((((flow * 3785.41178*1000) * N)/x)/4046.86)/rt) * eff
 }
 
 calc_side <- function(area){

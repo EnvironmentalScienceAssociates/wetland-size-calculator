@@ -22,7 +22,7 @@ function(input, output, session) {
                       crs = 4326)
     
     data.frame(season = c("Summer", "Winter"),
-               acres = c(summerArea(), winterArea()),
+               acres = c(round(summerArea()), round(winterArea())),
                season_color = c("#d95f02", "#7570b3")) |> 
       mutate(geometry = poly_sfc, 
              popup = paste("Area: ", acres, " (ac)")) |> 

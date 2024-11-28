@@ -32,7 +32,7 @@ function(input, output, session) {
   output$map = renderLeaflet({
     leaflet(options = leafletOptions(attributionControl = FALSE,
                                      zoomControl = TRUE)) |>
-      setView(lng = -121.805, lat = 38.24, zoom = 12) |>
+      setView(lng = -121.805, lat = 38.22, zoom = 12) |>
       addProviderTiles(providers$Esri.WorldTopoMap, 
                        # https://gis.stackexchange.com/questions/301710/r-leaflet-set-zoom-level-of-tiled-basemap-esri-world-imagery
                        options = providerTileOptions(noWrap = TRUE,

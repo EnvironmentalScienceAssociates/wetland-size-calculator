@@ -17,13 +17,13 @@ function(input, output, session) {
   })
   
   polygons <- reactive({
-    poly_sfc = st_sfc(list(st_polygon(x = list(calc_coords(summerSide()))), 
-                           st_polygon(x = list(calc_coords(winterSide())))), 
+    poly_sfc = st_sfc(list(st_polygon(x = list(calc_coords(winterSide()))), 
+                           st_polygon(x = list(calc_coords(summerSide())))), 
                       crs = 4326)
     
-    data.frame(season = c("Summer", "Winter"),
-               acres = c(round(summerArea()), round(winterArea())),
-               season_color = c("#d95f02", "#7570b3")) |> 
+    data.frame(season = c("Winter", "Summer"),
+               acres = c(round(winterArea()), round(summerArea())),
+               season_color = c("#7570b3", "#d95f02")) |> 
       mutate(geometry = poly_sfc, 
              popup = paste("Area: ", acres, " (ac)")) |> 
       st_as_sf()

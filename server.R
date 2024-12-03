@@ -1,11 +1,11 @@
 function(input, output, session) {
   
   winterArea <- reactive({
-    calc_area(input$flow_winter, input$N_winter, input$rt_winter, input$eff_winter, "winter")
+    calc_area(input$flow_winter, input$N_winter, input$rt_winter, "winter")
   })
   
   summerArea <- reactive({
-    calc_area(input$flow_summer, input$N_summer, input$rt_summer, input$eff_summer, "summer")
+    calc_area(input$flow_summer, input$N_summer, input$rt_summer, "summer")
   })
   
   winterSide <- reactive({

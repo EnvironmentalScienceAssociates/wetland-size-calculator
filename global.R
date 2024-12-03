@@ -6,10 +6,16 @@ library(dplyr)
 library(sf)
 library(geosphere)
 
-calc_area <- function(flow, N, rt, eff, season = c("winter", "summer")){
+# calc_area <- function(flow, N, rt, eff, season = c("winter", "summer")){
+#   x = if (season == "summer") 824.7 else 59.5
+#   # in acres
+#   (((((flow * 3785.41178*1000) * N)/x)/4046.86)/rt) * eff
+# }
+
+calc_area <- function(flow, N, rt, season = c("winter", "summer")){
   x = if (season == "summer") 824.7 else 59.5
   # in acres
-  (((((flow * 3785.41178*1000) * N)/x)/4046.86)/rt) * eff
+  (((((flow * 3785.41178*1000) * N)/x)/4046.86)/rt)
 }
 
 calc_side <- function(area){

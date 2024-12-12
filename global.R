@@ -6,16 +6,41 @@ library(dplyr)
 library(sf)
 library(geosphere)
 
-# calc_area <- function(flow, N, rt, eff, season = c("winter", "summer")){
-#   x = if (season == "summer") 824.7 else 59.5
-#   # in acres
-#   (((((flow * 3785.41178*1000) * N)/x)/4046.86)/rt) * eff
-# }
+# assumption in calculations below is that all calculations are for one day;
+#   day drops out of any units
 
-calc_area <- function(flow, N, rt, season = c("winter", "summer")){
-  x = if (season == "summer") 824.7 else 59.5
+# denitrification rates; units: mg/m2
+rates = c("winter" = 59.5,
+          "fallspring" = 321,
+          "summer" = 824.7)
+
+convert_flow <- function(flow){
+  # convert MGD to L
+  flow * 3.78541178 * 1e6  
+}
+
+calc_min_area <- function(flow){
+  # convert L to m3
+  m3 = convert_flow(flow)/1000
+  # find area required to spread water to a depth of 0.2 m
+  m2 = m3/0.2
+  # convert m2 to acres
+  m2/4046.86
+}
+
+calc_N_load <- function(flow, N){
+  # N units: mg/L
+  # return results in mg
+  N * convert_flow(flow)
+}
+
+calc_load_area <- function(flow, N, rate){
+  # assumes 100% efficiency is expected/needed
+  load = calc_N_load(flow, N)
+  # area in m2
+  m2 = load/rate
   # in acres
-  (((((flow * 3785.41178*1000) * N)/x)/4046.86)/rt)
+  m2/4046.86
 }
 
 calc_side <- function(area){
@@ -31,3 +56,5 @@ calc_coords <- function(dist){
   se_pt = destPoint(p = sw_pt, b = 90, d = dist)
   do.call(rbind, list(ne_pt, nw_pt, sw_pt, se_pt, ne_pt))
 }
+
+

@@ -5,13 +5,18 @@ library(leaflet)
 library(dplyr)
 library(sf)
 library(geosphere)
+library(ggplot2)
+library(plotly)
+
+season_colors = c("#7570b3", "#1b9e77", "#d95f02") |> 
+  setNames(c("Winter", "Fall", "Summer"))
 
 # assumption in calculations below is that all calculations are for one day;
 #   day drops out of any units
 
 # denitrification rates; units: mg/m2
 rates = c("winter" = 59.5,
-          "fallspring" = 321,
+          "fall" = 321,
           "summer" = 824.7)
 
 convert_flow <- function(flow){

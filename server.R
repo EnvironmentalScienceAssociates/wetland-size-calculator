@@ -8,8 +8,8 @@ function(input, output, session) {
     calc_min_area(input$flow_summer)
   })
   
-  fallspringMinArea <- reactive({
-    calc_min_area(input$flow_fallspring)
+  fallMinArea <- reactive({
+    calc_min_area(input$flow_fall)
   })
   
   winterLoadArea <- reactive({
@@ -20,8 +20,8 @@ function(input, output, session) {
     calc_load_area(input$flow_summer, input$N_summer, rates[["summer"]])
   })
   
-  fallspringLoadArea <- reactive({
-    calc_load_area(input$flow_fallspring, input$N_fallspring, rates[["fallspring"]])
+  fallLoadArea <- reactive({
+    calc_load_area(input$flow_fall, input$N_fall, rates[["fall"]])
   })
   
   observe({
@@ -29,9 +29,9 @@ function(input, output, session) {
     if (max_summer > 5) max_summer = 5
     updateSliderInput(session, "rt_summer", max = max_summer)
     
-    max_fallspring = floor(fallspringLoadArea()/fallspringMinArea())
-    if (max_fallspring > 5) max_fallspring = 5
-    updateSliderInput(session, "rt_fallspring", max = max_fallspring)
+    max_fall = floor(fallLoadArea()/fallMinArea())
+    if (max_fall > 5) max_fall = 5
+    updateSliderInput(session, "rt_fall", max = max_fall)
     
     max_winter = floor(winterLoadArea()/winterMinArea())
     if (max_winter > 5) max_winter = 5
@@ -46,8 +46,8 @@ function(input, output, session) {
     calc_load_area(input$flow_summer, input$N_summer, rates[["summer"]])/input$rt_summer
   })
   
-  fallspringLoadAreaAdj <- reactive({
-    calc_load_area(input$flow_fallspring, input$N_fallspring, rates[["fallspring"]])/input$rt_fallspring
+  fallLoadAreaAdj <- reactive({
+    calc_load_area(input$flow_fall, input$N_fall, rates[["fall"]])/input$rt_fall
   })
   
   observe({
@@ -59,9 +59,9 @@ function(input, output, session) {
     if (min_summer > 1) min_summer = 1
     updateSliderInput(session, "eff_summer", min = min_summer)
     
-    min_fallspring = round(fallspringMinArea()/fallspringLoadAreaAdj(), 2)
-    if (min_fallspring > 1) min_fallspring = 1
-    updateSliderInput(session, "eff_fallspring", min = min_fallspring)
+    min_fall = round(fallMinArea()/fallLoadAreaAdj(), 2)
+    if (min_fall > 1) min_fall = 1
+    updateSliderInput(session, "eff_fall", min = min_fall)
   })
   
   winterArea <- reactive({
@@ -72,8 +72,8 @@ function(input, output, session) {
     summerLoadAreaAdj() * input$eff_summer
   })
   
-  fallspringArea <- reactive({
-    fallspringLoadAreaAdj() * input$eff_fallspring
+  fallArea <- reactive({
+    fallLoadAreaAdj() * input$eff_fall
   })
   
   winterSide <- reactive({
@@ -84,33 +84,38 @@ function(input, output, session) {
     calc_side(summerArea())
   })
   
-  fallspringSide <- reactive({
-    calc_side(fallspringArea())
+  fallSide <- reactive({
+    calc_side(fallArea())
   })
   
-  output$winterText <- renderText({
-    paste("Area: ", round(winterArea()), " (ac)")
-  })
-  
-  output$summerText <- renderText({
-    paste("Area: ", round(summerArea()), " (ac)")
-  })
-  
-  output$fallspringText <- renderText({
-    paste("Area: ", round(fallspringArea()), " (ac)")
+  output$plot <- renderPlotly({
+    tmp = data.frame(Season = names(season_colors),
+                     Area = round(c(winterArea(), fallArea(), summerArea()))) |> 
+      mutate(Season = factor(Season, levels = rev(names(season_colors))))
+    
+    p = ggplot(tmp) +
+      geom_col(aes(x = Season, y = Area, fill = Season, 
+                   text = paste0("Season: ", Season, "<br>", "Area: ", Area, " (ac)"))) +
+      labs(y = "Area (ac)") +
+      scale_fill_manual(values = season_colors) +
+      theme_minimal() +
+      theme(legend.position = "none")
+    
+    ggplotly(p, tooltip = "text")
   })
   
   polygons <- reactive({
     poly_sfc = st_sfc(list(st_polygon(x = list(calc_coords(winterSide()))),
-                           st_polygon(x = list(calc_coords(fallspringSide()))),
+                           st_polygon(x = list(calc_coords(fallSide()))),
                            st_polygon(x = list(calc_coords(summerSide())))), 
                       crs = 4326)
     
-    data.frame(season = c("Winter", "Fall/Spring", "Summer"),
+    data.frame(season = names(season_colors),
+               # these need to be in the same order as the season colors and the poly_sfc
                acres = c(round(winterArea()), 
-                         round(fallspringArea()),
+                         round(fallArea()),
                          round(summerArea())),
-               season_color = c("#7570b3", "#1b9e77", "#d95f02")) |> 
+               season_color = unname(season_colors)) |> 
       mutate(geometry = poly_sfc, 
              popup = paste("Area: ", acres, " (ac)")) |> 
       st_as_sf()
@@ -125,7 +130,9 @@ function(input, output, session) {
                        options = providerTileOptions(noWrap = TRUE,
                                                      maxNativeZoom = 18,
                                                      maxZoom = 22)) |> 
-      addLegend("topleft", colors = c("#d95f02", "#1b9e77", "#7570b3"), labels = c("Summer", "Fall/Spring", "Winter"),
+      addLegend("topleft", 
+                colors = rev(unname(season_colors)), 
+                labels = rev(names(season_colors)),
                 title = "Season")
   })
   
@@ -136,8 +143,6 @@ function(input, output, session) {
       clearShapes() |> 
       addPolygons(data = polygons(), 
                   color = ~season_color,
-                  label = ~season,
-                  popup = ~popup,
                   opacity = 0.7, 
                   fillOpacity = 0.01)
   })
